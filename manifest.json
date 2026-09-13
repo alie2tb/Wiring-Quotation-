@@ -2,7 +2,7 @@
   "name": "Ali Wiring Quotation",
   "short_name": "Ali Wiring",
   "description": "Generate wiring materials quotations and export them as PDF.",
-  "start_url": "./quotation.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

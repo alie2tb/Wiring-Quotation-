@@ -2,8 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Ali Wiring Quotation</title>
+
+  <!-- PWA: installability -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#667eea">
+
+  <!-- Android / Chrome -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+
+  <!-- iOS -->
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ali Wiring">
+
+  <!-- Windows -->
+  <meta name="msapplication-TileColor" content="#667eea">
+  <meta name="msapplication-TileImage" content="icons/icon-192.png">
   <style>
     * {
       margin: 0;
@@ -63,6 +82,45 @@
     .menu-button:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .install-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 20px;
+      background: #f3f0fa;
+      border-bottom: 1px solid #e0d9f3;
+      flex-shrink: 0;
+    }
+
+    .install-banner.active {
+      display: flex;
+    }
+
+    .install-banner span {
+      font-size: 13px;
+      color: #4b3b73;
+    }
+
+    .install-banner button {
+      flex-shrink: 0;
+      background: #764ba2;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .install-banner .dismiss-btn {
+      background: transparent;
+      color: #764ba2;
+      padding: 8px 6px;
+      font-weight: 500;
     }
 
     .content {
@@ -251,6 +309,14 @@
     <div class="header">
       <h1>📋 Ali Wiring Quotation</h1>
       <button class="menu-button" onclick="openModal()">CREATE PDF</button>
+    </div>
+
+    <div class="install-banner" id="installBanner">
+      <span>Install this app for quick, offline access</span>
+      <div style="display: flex; gap: 4px;">
+        <button class="dismiss-btn" onclick="dismissInstallBanner()">Not now</button>
+        <button onclick="installApp()">Install</button>
+      </div>
     </div>
 
     <div class="content">
@@ -541,6 +607,48 @@
 
     // Initial render
     renderItems();
+
+    // Install prompt handling (Chrome/Edge/Android — iOS uses Share > Add to Home Screen)
+    let deferredInstallPrompt = null;
+    let installBannerDismissed = false;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (!installBannerDismissed) {
+        document.getElementById('installBanner').classList.add('active');
+      }
+    });
+
+    function installApp() {
+      const banner = document.getElementById('installBanner');
+      banner.classList.remove('active');
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.finally(() => {
+        deferredInstallPrompt = null;
+      });
+    }
+
+    function dismissInstallBanner() {
+      document.getElementById('installBanner').classList.remove('active');
+      installBannerDismissed = true;
+    }
+
+    window.addEventListener('appinstalled', () => {
+      document.getElementById('installBanner').classList.remove('active');
+    });
+
+    // Register service worker so the app can be installed on supported platforms.
+    // This will safely no-op (with a quiet log) in preview contexts where sw.js
+    // isn't served alongside this file — it works once hosted as a full bundle.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.debug('Service worker not available in this context:', err.message);
+        });
+      });
+    }
   </script>
 </body>
 </html>

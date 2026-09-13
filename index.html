@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ali Wiring Quotation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .menu-button {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .content {
+      padding: 30px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .content::-webkit-scrollbar-track {
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+
+    .content::-webkit-scrollbar-thumb {
+      background: #c5c5e0;
+      border-radius: 4px;
+    }
+
+    .content::-webkit-scrollbar-thumb:hover {
+      background: #667eea;
+    }
+
+    .item-section {
+      margin-bottom: 25px;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      align-items: center;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border-left: 4px solid #667eea;
+    }
+
+    .item-name {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-block;
+      border-bottom: 1px dashed #999;
+      transition: color 0.2s ease;
+    }
+
+    .item-name:hover {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .item-name.non-editable {
+      cursor: default;
+      border-bottom: none;
+    }
+
+    .item-price {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .quantity-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      text-align: center;
+      transition: border-color 0.3s ease;
+    }
+
+    .quantity-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+
+
+    /* Modal for quotation details */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-cancel:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-generate {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📋 Ali Wiring Quotation</h1>
+      <button class="menu-button" onclick="openModal()">CREATE PDF</button>
+    </div>
+
+    <div class="content">
+      <div class="item-section" id="itemsContainer">
+      </div>
+
+      <div class="item-section" style="margin-top: -10px;">
+        <div class="item-row" style="border-left-color: #764ba2; background: #f3f0fa;">
+          <div>
+            <div class="item-name non-editable">Labour Cost</div>
+            <div class="item-price">Automatically calculated as 20% of items total</div>
+          </div>
+          <div style="text-align: center; font-weight: 600; color: #764ba2; font-size: 14px;">20%</div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+  <!-- Modal for quotation details -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2>Quotation Details</h2>
+      
+      <div class="form-group">
+        <label>Client Name</label>
+        <input type="text" id="clientName" placeholder="Enter client name">
+      </div>
+
+      <div class="form-group">
+        <label>WhatsApp Number</label>
+        <input type="tel" id="clientPhone" placeholder="Enter WhatsApp number (optional)">
+      </div>
+
+      <div class="form-group">
+        <label>Quote Number</label>
+        <input type="text" id="quoteNumber" placeholder="e.g., QT-001">
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-generate" onclick="generatePDF()">Generate PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- jsPDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    // Item data (single source of truth for the form and the PDF)
+    const items = [
+      { id: 'qty1', name: 'PVC Pipes', price: 3000 },
+      { id: 'qty2', name: '3X6 Square Boxes', price: 400 },
+      { id: 'qty3', name: '3X3 Square Boxes', price: 600 },
+      { id: 'qty4', name: 'Round Box', price: 350 },
+      { id: 'qty5', name: 'Combined DB', price: 13000 },
+      { id: 'qty6', name: 'D Iron', price: 16000 },
+      { id: 'qty7', name: '3 Inches Nails', price: 6500 },
+      { id: 'qty8', name: 'Couplings', price: 100 },
+      { id: 'qty9', name: 'Nipples', price: 100 },
+      { id: 'qty10', name: 'Earth Rod', price: 7000 },
+      { id: 'qty11', name: '1.5MM Red Wire', price: 1350 },
+      { id: 'qty12', name: '1.5MM Black Wire', price: 1350 },
+      { id: 'qty13', name: '2.5MM Red Wire', price: 2100 },
+      { id: 'qty14', name: '2.5MM Black Wire', price: 2100 },
+      { id: 'qty15', name: '2.5MM Green Wire', price: 2100 },
+      { id: 'qty16', name: 'Bulb Holder', price: 3500 },
+      { id: 'qty17', name: 'Wall Glass', price: 13500 },
+      { id: 'qty18', name: 'Double Socket', price: 11500 },
+      { id: 'qty19', name: '2 Gang Switches', price: 6500 },
+      { id: 'qty20', name: '1 Gang Switch', price: 4500 },
+      { id: 'qty21', name: '10MM Red Wire', price: 9500 },
+      { id: 'qty22', name: '10MM Black Wire', price: 9500 },
+      { id: 'qty23', name: 'Main Switch', price: 17000 },
+      { id: 'qty24', name: '30A Circuit Breaker', price: 5500 },
+      { id: 'qty25', name: '5A Circuit Breaker', price: 5500 },
+      { id: 'qty26', name: 'Neutral Link', price: 4000 },
+      { id: 'qty27', name: 'Screws', price: 40 },
+      { id: 'qty28', name: 'Round Covers', price: 200 },
+      { id: 'qty29', name: 'Tapes', price: 1500 }
+    ];
+
+    // Build the item rows from the items array
+    function renderItems() {
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = items.map(item => `
+        <div class="item-row">
+          <div>
+            <div class="item-name" onclick="editPrice('${item.id}')">${item.name}</div>
+            <div class="item-price" id="price-${item.id}">K ${item.price.toLocaleString()} each</div>
+          </div>
+          <input type="number" class="quantity-input" id="${item.id}" placeholder="0" min="0">
+        </div>
+      `).join('');
+    }
+
+    // Click an item's name to update its price
+    function editPrice(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const input = prompt(`Enter new price for "${item.name}" (K):`, item.price);
+      if (input === null) return; // cancelled
+
+      const newPrice = parseFloat(input);
+      if (isNaN(newPrice) || newPrice < 0) {
+        alert('Please enter a valid, non-negative price.');
+        return;
+      }
+
+      item.price = newPrice;
+      document.getElementById(`price-${item.id}`).textContent = `K ${newPrice.toLocaleString()} each`;
+    }
+
+    // Modal functions
+    function openModal() {
+      document.getElementById('modal').classList.add('active');
+      // Generate default quote number
+      const today = new Date();
+      const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+      document.getElementById('quoteNumber').value = `QT-${dateStr}`;
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // Generate PDF
+    function generatePDF() {
+      const clientName = document.getElementById('clientName').value;
+      const clientPhone = document.getElementById('clientPhone').value;
+      const quoteNumber = document.getElementById('quoteNumber').value;
+
+      if (!clientName) {
+        alert('Please enter client name');
+        return;
+      }
+
+      if (!quoteNumber) {
+        alert('Please enter quote number');
+        return;
+      }
+
+      // Build line items from current quantities and (possibly edited) prices
+      const lineItems = items
+        .map(item => {
+          const qty = parseInt(document.getElementById(item.id).value) || 0;
+          return { name: item.name, price: item.price, qty, total: qty * item.price };
+        })
+        .filter(li => li.qty > 0);
+
+      if (lineItems.length === 0) {
+        alert('Please enter at least one quantity');
+        return;
+      }
+
+      const itemsSubtotal = lineItems.reduce((sum, li) => sum + li.total, 0);
+      const labourCost = itemsSubtotal * 0.2;
+      const grandTotal = itemsSubtotal + labourCost;
+
+      // Create PDF
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      // Set colors
+      const primaryColor = [102, 126, 234];
+      const darkColor = [51, 51, 51];
+      const lightGray = [240, 244, 255];
+      const pageBottom = 275;
+
+      function drawHeader() {
+        doc.setFillColor(...primaryColor);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont(undefined, 'bold');
+        doc.text('QUOTATION', 20, 25);
+      }
+
+      drawHeader();
+
+      // Quote details
+      doc.setTextColor(...darkColor);
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Quote #: ${quoteNumber}`, 20, 50);
+
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      doc.text(`Date: ${dateStr}`, 20, 57);
+
+      // Client details
+      doc.setFont(undefined, 'bold');
+      doc.text('BILL TO:', 20, 70);
+      doc.setFont(undefined, 'normal');
+      doc.text(clientName, 20, 77);
+      if (clientPhone) {
+        doc.text(clientPhone, 20, 84);
+      }
+
+      // Table header
+      let yPos = 100;
+
+      function drawTableHeader() {
+        doc.setFillColor(...lightGray);
+        doc.rect(20, yPos, 170, 8, 'F');
+        doc.setTextColor(...primaryColor);
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(10);
+        doc.text('Description', 25, yPos + 6);
+        doc.text('Unit Price', 100, yPos + 6);
+        doc.text('Qty', 135, yPos + 6);
+        doc.text('Amount', 155, yPos + 6);
+        yPos += 18;
+        doc.setTextColor(...darkColor);
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+      }
+
+      drawTableHeader();
+
+      function addPageIfNeeded() {
+        if (yPos > pageBottom) {
+          doc.addPage();
+          yPos = 20;
+        }
+      }
+
+      lineItems.forEach(li => {
+        addPageIfNeeded();
+        doc.text(li.name, 25, yPos);
+        doc.text(`K ${li.price.toLocaleString()}`, 100, yPos);
+        doc.text(li.qty.toString(), 135, yPos);
+        doc.text(`K ${li.total.toLocaleString()}`, 155, yPos);
+        yPos += 8;
+      });
+
+      // Subtotal
+      addPageIfNeeded();
+      yPos += 2;
+      doc.setFont(undefined, 'bold');
+      doc.text('Subtotal:', 130, yPos);
+      doc.text(`K ${itemsSubtotal.toLocaleString()}`, 155, yPos);
+      yPos += 8;
+
+      // Labour cost (20% of items subtotal)
+      addPageIfNeeded();
+      doc.setFont(undefined, 'normal');
+      doc.text('Labour Cost (20%):', 105, yPos);
+      doc.text(`K ${labourCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, 155, yPos);
+      yPos += 8;
+
+      // Total section
+      yPos += 5;
+      addPageIfNeeded();
+      doc.setFillColor(...lightGray);
+      doc.rect(20, yPos, 170, 8, 'F');
+      doc.setTextColor(...primaryColor);
+      doc.setFont(undefined, 'bold');
+      doc.setFontSize(11);
+      doc.text('TOTAL:', 130, yPos + 6);
+      doc.text(`K ${grandTotal.toLocaleString()}`, 155, yPos + 6);
+
+      // Footer
+      const footerY = doc.internal.pageSize.height - 25;
+      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.text('This is a quotation and does not constitute an invoice.', 20, footerY);
+      doc.text('Valid for 30 days from issue date.', 20, footerY + 6);
+
+      // Save PDF
+      doc.save(`quotation-${quoteNumber}.pdf`);
+
+      // Close modal and show success
+      closeModal();
+      alert(`PDF created successfully!\nFile: quotation-${quoteNumber}.pdf`);
+    }
+
+    // Initial render
+    renderItems();
+  </script>
+</body>
+</html>

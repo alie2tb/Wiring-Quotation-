@@ -1,6 +1,6 @@
 // Service worker for Ali Wiring Quotation
 // Bump this version whenever cached files change so old caches get cleared.
-const CACHE_NAME = 'ali-wiring-quotation-v1';
+const CACHE_NAME = 'ali-wiring-quotation-v2';
 
 const PRECACHE_URLS = [
   './index.html',
